@@ -1,0 +1,51 @@
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 150px);  /* Ajuste o número de colunas e o tamanho das cartas */
+    grid-gap: 150px;  /* Aumenta o espaço entre as cartas */
+    justify-content: center;
+}
+
+.card {
+    width: 250px;  /* Aumenta a largura das cartas */
+    height: 250px;  /* Aumenta a altura das cartas */
+    position: relative;
+    cursor: pointer;
+    background-color: #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    perspective: 1000px;
+}
+
+.card .front,
+.card .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;  /* Aumenta o tamanho da fonte dentro das cartas */
+    backface-visibility: hidden;
+    border-radius: 8px;
+    transition: transform 0.6s;
+}
+
+.card .front {
+    background-color: #333;
+    color: white;
+    transform: rotateY(0deg);
+}
+
+.card .back {
+    background-color: #f4f4f4;
+    color: #333;
+    transform: rotateY(180deg);
+}
+
+.card.flipped .front {
+    transform: rotateY(180deg);
+}
+
+.card.flipped .back {
+    transform: rotateY(0deg);
+}

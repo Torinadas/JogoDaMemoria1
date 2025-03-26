@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; font-family: 'Courier New', Courier, monospace;">Jogo da Memória</h1>
+        <div id="game-board" class="game-board">
+            <!-- As cartas serão geradas dinamicamente com JavaScript -->
+        </div>
+        <button onclick="resetGame()" style="text-align: center; border-radius: 10%; font-family: 'Courier New', Courier, monospace;">Reiniciar Jogo</button>
+    </div>
+
+    <script>
+        // Cartas do jogo (cada carta tem um valor e um id)
+        const cards = [
+            { id: 1, value: '🍐' },
+            { id: 2, value: '🍇' },
+            { id: 3, value: '🍎' },
+            { id: 4, value: '🍌' },
+            { id: 1, value: '🍐' },
+            { id: 2, value: '🍇' },
+            { id: 3, value: '🍎' },
+            { id: 4, value: '🍌' },
+        ];
+
+        let flippedCards = [];  // Armazena as cartas viradas
+        let matchedCards = [];  // Armazena as cartas que já fizeram par
+
+        // Embaralha as cartas (algoritmo de Fisher-Yates)
+        function shuffle(cards) {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]]; // Troca as cartas
+            }
+        }
+
+        // Cria a carta no HTML
+        function createCardElement(card) {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.setAttribute('data-id', card.id);
+            cardElement.setAttribute('data-value', card.value);
+            cardElement.addEventListener('click', flipCard);
+            cardElement.innerHTML = `<div class="front">?</div><div class="back">${card.value}</div>`;
+            return cardElement;
+        }
+
+        // Vira a carta
+        function flipCard() {
+            if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
+                this.classList.add('flipped');
+                flippedCards.push(this);
+
+                // Verifica se duas cartas foram viradas
+                if (flippedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        // Verifica se as cartas viradas fazem par
+        function checkMatch() {
+            const [firstCard, secondCard] = flippedCards;
+
+            if (firstCard.dataset.value === secondCard.dataset.value) {
+                matchedCards.push(firstCard, secondCard);
+                flippedCards = [];  // Reseta o array de cartas viradas
+                checkWin();  // Verifica se o jogador venceu
+            } else {
+                // Se as cartas não fizerem par, vira novamente após 1 segundo
+                setTimeout(() => {
+                    firstCard.classList.remove('flipped');
+                    secondCard.classList.remove('flipped');
+                    flippedCards = [];  // Reseta o array de cartas viradas
+                }, 1000);
+            }
+        }
+
+        // Função para disparar o efeito de confetes
+        function startConfetti() {
+            confetti({
+                particleCount: 100,      // Número de partículas
+                spread: 70,              // A área de dispersão
+                origin: { x: 0.5, y: 0.5 },  // Origem do confete (meio da tela)
+                colors: ['#ff0000', '#00ff00', '#0000ff', '#ff9900']  // Cores dos confetes
+            });
+        }
+
+        // Função que verifica se o jogo foi vencido
+        function checkWin() {
+            // Se todas as cartas forem combinadas, ou seja, o número de cartas combinadas for igual ao número total de cartas
+            if (matchedCards.length === cards.length) {
+                setTimeout(() => {
+                    startConfetti(); 
+                    startConfetti();  // Dispara o efeito de confetes
+                }, 500); // Atraso de 0.5 segundos para deixar o jogador ver o último par combinado
+            }
+        }
+
+        // Reinicia o jogo
+        function resetGame() {
+            matchedCards = [];
+            flippedCards = [];
+            shuffle(cards);  // Embaralha as cartas
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';  // Limpa o tabuleiro
+            cards.forEach(card => gameBoard.appendChild(createCardElement(card))); // Adiciona as cartas ao tabuleiro
+        }
+
+        // Inicia o jogo
+        window.onload = () => {
+            shuffle(cards);  // Embaralha as cartas
+            resetGame();  // Cria o tabuleiro com as cartas
+        };
+
+    </script>
+</body>
+</html>
